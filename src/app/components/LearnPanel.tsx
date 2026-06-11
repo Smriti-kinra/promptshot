@@ -93,6 +93,7 @@ function MythsSection({ items }: { items: typeof LEARN_CONTENT.sections[1]["item
         <div key={i}>
           <button
             onClick={() => setExpanded(expanded === i ? null : i)}
+            aria-expanded={expanded === i}
             style={{
               width: "100%",
               background: "none",
@@ -106,6 +107,20 @@ function MythsSection({ items }: { items: typeof LEARN_CONTENT.sections[1]["item
               textAlign: "left",
             }}
           >
+            <span
+              aria-hidden="true"
+              style={{
+                color: C.secondary,
+                display: "inline-block",
+                fontSize: "12px",
+                lineHeight: 1.5,
+                transform:
+                  expanded === i ? "rotate(90deg)" : "rotate(0deg)",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              ▶
+            </span>
             <span style={{
               fontSize: "13px",
               color: C.secondary,
@@ -210,8 +225,65 @@ function ExamplesSection({ items }: { items: typeof LEARN_CONTENT.sections[2]["i
   );
 }
 
+function ImpactSection({ items }: { items: typeof LEARN_CONTENT.sections[3]["items"] }) {
+  const impactItems = items as {
+    metric: string;
+    point: string;
+    detail: string;
+  }[];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      {impactItems.map((item) => (
+        <div
+          key={item.metric}
+          style={{
+            border: `0.5px solid ${C.tealBorder}`,
+            borderRadius: "8px",
+            padding: "14px",
+            background: C.tealDim,
+          }}
+        >
+          <div
+            style={{
+              color: C.teal,
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              marginBottom: "8px",
+              textTransform: "uppercase",
+            }}
+          >
+            {item.metric}
+          </div>
+          <div
+            style={{
+              color: C.primary,
+              fontSize: "14px",
+              fontWeight: 600,
+              lineHeight: 1.45,
+              marginBottom: "6px",
+            }}
+          >
+            {item.point}
+          </div>
+          <div
+            style={{
+              color: C.secondary,
+              fontSize: "13px",
+              lineHeight: 1.55,
+            }}
+          >
+            {item.detail}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // FAQ section — accordion
-function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[3]["items"] }) {
+function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[4]["items"] }) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const faqItems = items as { question: string; answer: string }[];
   return (
@@ -220,6 +292,7 @@ function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[3]["items"
         <div key={i}>
           <button
             onClick={() => setExpanded(expanded === i ? null : i)}
+            aria-expanded={expanded === i}
             style={{
               width: "100%",
               background: "none",
@@ -301,7 +374,7 @@ export function LearnPanel({ isOpen, onClose }: LearnPanelProps) {
 
   if (!rendered) return null;
 
-  const [anatomy, myths, examples, faq] = LEARN_CONTENT.sections;
+  const [anatomy, myths, examples, impact, faq] = LEARN_CONTENT.sections;
 
   return (
     <div
@@ -365,6 +438,7 @@ export function LearnPanel({ isOpen, onClose }: LearnPanelProps) {
           </div>
           <button
             onClick={onClose}
+            aria-label="Close reference"
             style={{
               background: "none",
               border: "none",
@@ -394,6 +468,12 @@ export function LearnPanel({ isOpen, onClose }: LearnPanelProps) {
         {/* Examples */}
         <SectionHeader title={examples.title} subtitle={examples.subtitle as string | null} />
         <ExamplesSection items={examples.items} />
+
+        <SectionDivider />
+
+        {/* Impact */}
+        <SectionHeader title={impact.title} subtitle={impact.subtitle as string | null} />
+        <ImpactSection items={impact.items} />
 
         <SectionDivider />
 

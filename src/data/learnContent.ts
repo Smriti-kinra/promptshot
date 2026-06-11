@@ -120,6 +120,33 @@ export const LEARN_CONTENT = {
       ]
     },
     {
+      id: 'impact',
+      title: 'Why efficient prompts matter',
+      subtitle: 'Prompt quality is also resource design',
+      items: [
+        {
+          metric: 'One-shot accuracy',
+          point: 'The cleanest environmental win is not needing a second or third attempt.',
+          detail: 'Every retry repeats input processing, output generation, network transfer, and cooling demand. A precise first prompt is a small conservation behavior repeated at internet scale.'
+        },
+        {
+          metric: 'Constraint density',
+          point: 'Useful constraints reduce wandering output.',
+          detail: 'Format, audience, tone, inclusions, and exclusions give the model a smaller target. That means less wasted generation and fewer corrections.'
+        },
+        {
+          metric: 'Right-sized context',
+          point: 'Context should be specific, not encyclopedic.',
+          detail: 'The model already has general knowledge. Add the facts it cannot infer: audience, goal, stakes, source material, and what would make the answer unusable.'
+        },
+        {
+          metric: 'Negative space',
+          point: 'Saying what to avoid is often cheaper than cleaning it up later.',
+          detail: 'Negative constraints prevent common failure modes: jargon, sales language, unsafe advice, extra sections, unsupported claims, or code dependencies.'
+        }
+      ]
+    },
+    {
       id: 'faq',
       title: 'FAQ',
       subtitle: null,
@@ -134,11 +161,15 @@ export const LEARN_CONTENT = {
         },
         {
           question: 'How does AI actually use water?',
-          answer: 'Data centres that run AI models require massive cooling systems. That cooling uses water — evaporated to remove heat from servers. A 2023 University of Massachusetts study estimated roughly 10ml of water per ChatGPT query. Multiply that by billions of daily interactions and it becomes a serious infrastructure concern.'
+          answer: 'Data centres that run AI models need cooling. Some cooling systems consume water directly, and electricity generation can also have water demand upstream. Exact impact varies by model, data centre, region, weather, and energy mix, so PromptShot uses estimates as directional feedback rather than exact accounting.'
         },
         {
           question: 'Why show environmental impact in a game?',
           answer: "Because the skill gap in prompting doesn't feel real until you see its cost. A person who needs 5 follow-up prompts to get the same output as someone who got it in one used 5× the resources. Prompt engineering is not just a productivity skill — it's a conservation behaviour."
+        },
+        {
+          question: 'What should I optimize for first?',
+          answer: 'First-shot success. A short prompt that misses the target is not efficient if it creates three retries. The best prompt is clear enough to land the output once, then brief enough to avoid unnecessary tokens.'
         },
         {
           question: 'What is a perfect prompt?',
