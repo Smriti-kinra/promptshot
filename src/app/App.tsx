@@ -186,6 +186,80 @@ function AlreadyPlayed({
   );
 }
 
+// ─── Water Glass Effect Component ──────────────────────────────────────────────
+
+function WaterGlass({ waterMl }: { waterMl: number }) {
+  const [fillHeight, setFillHeight] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Map 10ml to 30%, scale up linearly, max out at 95%
+      const target = Math.min(95, Math.max(15, (waterMl / 35) * 100));
+      setFillHeight(target);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [waterMl]);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "60px",
+        height: "110px",
+        border: "2px solid rgba(255, 255, 255, 0.15)",
+        borderBottomLeftRadius: "12px",
+        borderBottomRightRadius: "12px",
+        borderTop: "none",
+        background: "rgba(255, 255, 255, 0.02)",
+        backdropFilter: "blur(8px)",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        display: "flex",
+        alignItems: "flex-end",
+      }}
+    >
+      {/* Liquid Fill */}
+      <div
+        style={{
+          width: "100%",
+          height: `${fillHeight}%`,
+          background: "var(--ps-teal)",
+          position: "relative",
+          transition: "height 2.5s cubic-bezier(0.1, 0.8, 0.2, 1)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Spinning Wave 1 */}
+        <div
+          style={{
+            width: "200%",
+            height: "200%",
+            background: "var(--ps-surface)",
+            position: "absolute",
+            left: "-50%",
+            top: "-190%",
+            borderRadius: "38%",
+            animation: "wave-spin 6s linear infinite",
+          }}
+        />
+        {/* Spinning Wave 2 (for depth) */}
+        <div
+          style={{
+            width: "200%",
+            height: "200%",
+            background: "rgba(18, 28, 20, 0.6)",
+            position: "absolute",
+            left: "-60%",
+            top: "-185%",
+            borderRadius: "40%",
+            animation: "wave-spin 8s linear infinite",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ─── main helper ──────────────────────────────────────────────────────────────
 
 function getDayOfYear(d: Date): number {
@@ -655,26 +729,47 @@ export default function App() {
               </div>
 
               {gameState === "impact" && (
-                <div style={{ background: "var(--ps-surface)", borderLeft: "4px solid var(--ps-teal)", padding: "24px", borderRadius: "8px", marginBottom: "24px", animation: "slideUp 0.6s ease-out forwards" }}>
+                <div
+                  style={{
+                    background: "var(--ps-surface)",
+                    borderLeft: "4px solid var(--ps-teal)",
+                    padding: "24px",
+                    borderRadius: "8px",
+                    marginBottom: "24px",
+                    animation: "slideUp 0.6s ease-out forwards",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "16px",
+                  }}
+                >
                   <style>{`@keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }`}</style>
-                  <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
-                    This prompt used <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>1</span> API call
+                  <div style={{ flex: 1 }}>
+                    <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
+                      This prompt used <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>1</span> API call
+                    </div>
+                    <div style={{ marginBottom: score.total < 180 ? "16px" : "0", fontSize: "var(--ps-text-secondary-size)", color: "var(--ps-text-secondary)" }}>
+                      ≈ <span style={{ color: "var(--ps-teal)" }}>{score.waterMl}ml</span> water · ≈ <span style={{ color: "var(--ps-teal)" }}>{score.co2Grams}g</span> CO₂
+                    </div>
+                    {score.total < 180 && (
+                      <>
+                        <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
+                          A score this low typically means 3+ follow-up prompts to reach this output
+                        </div>
+                        <div style={{ marginBottom: "16px", fontSize: "var(--ps-text-secondary-size)" }}>
+                          That adds ≈ 30ml water — about <span style={{ color: "var(--ps-amber)", fontWeight: 600 }}>a tablespoon</span>
+                        </div>
+                      </>
+                    )}
+                    <div style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontStyle: "italic" }}>
+                      Better prompts = less AI = less water. This is the skill.
+                    </div>
                   </div>
-                  <div style={{ marginBottom: score.total < 180 ? "16px" : "0", fontSize: "var(--ps-text-secondary-size)", color: "var(--ps-text-secondary)" }}>
-                    ≈ <span style={{ color: "var(--ps-teal)" }}>{score.waterMl}ml</span> water · ≈ <span style={{ color: "var(--ps-teal)" }}>{score.co2Grams}g</span> CO₂
-                  </div>
-                  {score.total < 180 && (
-                    <>
-                      <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
-                        A score this low typically means 3+ follow-up prompts to reach this output
-                      </div>
-                      <div style={{ marginBottom: "16px", fontSize: "var(--ps-text-secondary-size)" }}>
-                        That adds ≈ 30ml water — about <span style={{ color: "var(--ps-amber)", fontWeight: 600 }}>a tablespoon</span>
-                      </div>
-                    </>
-                  )}
-                  <div style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontStyle: "italic" }}>
-                    Better prompts = less AI = less water. This is the skill.
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                    <WaterGlass waterMl={score.waterMl} />
+                    <span style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontWeight: 600 }}>
+                      {score.waterMl}ml
+                    </span>
                   </div>
                 </div>
               )}
