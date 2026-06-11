@@ -1,47 +1,55 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* PromptShot Color System */
-  --ps-background: #0A0A0A;
-  --ps-surface: #141414;
-  --ps-text-primary: #F0EFE8;
-  --ps-text-secondary: #888880;
-  --ps-amber: #F59E0B;
-  --ps-teal: #14B8A6;
-  
+  /* PromptShot Forest Green System */
+  --ps-background: #0B1610;
+  --ps-surface: #121C14;
+  --ps-text-primary: #D4E8D4;
+  --ps-text-secondary: #4A6B4A;
+  --ps-text-muted: #2E4F31;
+  --ps-mint: #6EE09B;
+  --ps-amber: #F5C518;
+  --ps-red: #FF5F5F;
+  --ps-border: #243B27;
+  --ps-border-subtle: #1A2E1C;
+
   /* Typography Scale */
-  --ps-text-caption: 12px;
+  --ps-text-caption: 11px;
   --ps-text-secondary-size: 14px;
-  --ps-text-body: 16px;
-  --ps-text-subhead: 20px;
+  --ps-text-body: 15px;
+  --ps-text-subhead: 18px;
   --ps-text-heading: 28px;
   --ps-text-display: 40px;
-  
-  /* Original tokens */
+
+  /* Font families */
+  --ps-font-ui: 'Space Grotesk', system-ui, sans-serif;
+  --ps-font-mono: 'JetBrains Mono', monospace;
+
+  /* Original tokens — oklch format required by Tailwind v4 color-mix processing */
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
+  --background: oklch(0.14 0.024 145);
+  --foreground: oklch(0.90 0.038 145);
+  --card: oklch(0.17 0.024 145);
+  --card-foreground: oklch(0.90 0.038 145);
+  --popover: oklch(0.17 0.024 145);
+  --popover-foreground: oklch(0.90 0.038 145);
+  --primary: oklch(0.82 0.13 155);
+  --primary-foreground: oklch(0.14 0.024 145);
+  --secondary: oklch(0.21 0.028 145);
+  --secondary-foreground: oklch(0.90 0.038 145);
+  --muted: oklch(0.21 0.028 145);
+  --muted-foreground: oklch(0.44 0.048 145);
+  --accent: oklch(0.82 0.13 155);
+  --accent-foreground: oklch(0.14 0.024 145);
+  --destructive: oklch(0.65 0.19 25);
+  --destructive-foreground: oklch(0.14 0.024 145);
+  --border: oklch(0.25 0.033 145);
   --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+  --input-background: oklch(0.17 0.024 145);
+  --switch-background: oklch(0.25 0.033 145);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.82 0.13 155);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -143,6 +151,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   /**
