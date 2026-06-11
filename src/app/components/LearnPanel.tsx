@@ -7,27 +7,27 @@ interface LearnPanelProps {
 }
 
 const C = {
-  bg: "#0A0A0A",
-  surface: "#141414",
-  primary: "#F0EFE8",
-  secondary: "#888880",
-  amber: "#F59E0B",
-  amberDim: "rgba(245,158,11,0.15)",
-  teal: "#14B8A6",
-  tealDim: "rgba(20,184,166,0.12)",
-  border: "rgba(255,255,255,0.08)",
-  divider: "rgba(255,255,255,0.06)",
-  falseBg: "rgba(239,68,68,0.12)",
-  falseText: "rgba(239,68,68,0.8)",
-  tealBorder: "rgba(20,184,166,0.4)",
-  redBorder: "rgba(239,68,68,0.4)",
+  bg: "#0B1610",
+  surface: "#121C14",
+  surface2: "#1A2E1C",
+  primary: "#D4E8D4",
+  secondary: "#4A6B4A",
+  mint: "#6EE09B",
+  mintDim: "rgba(110,224,155,0.12)",
+  amber: "#F5C518",
+  amberDim: "rgba(245,197,24,0.12)",
+  red: "#FF5F5F",
+  redDim: "rgba(255,95,95,0.12)",
+  border: "#243B27",
+  divider: "#1A2E1C",
+  font: "'Space Grotesk', system-ui, sans-serif",
+  mono: "'JetBrains Mono', monospace",
 };
 
-// Verdict badge
 function VerdictBadge({ verdict }: { verdict: string }) {
-  let bg = C.surface;
+  let bg = C.surface2;
   let color = C.secondary;
-  if (verdict === "FALSE") { bg = C.falseBg; color = C.falseText; }
+  if (verdict === "FALSE") { bg = C.redDim; color = C.red; }
   if (verdict === "WASTEFUL") { bg = C.amberDim; color = C.amber; }
   return (
     <span style={{
@@ -35,46 +35,29 @@ function VerdictBadge({ verdict }: { verdict: string }) {
       color,
       padding: "2px 10px",
       borderRadius: "9999px",
-      fontSize: "11px",
-      fontWeight: 600,
+      fontSize: "10px",
+      fontWeight: 700,
       whiteSpace: "nowrap",
       flexShrink: 0,
+      fontFamily: C.mono,
+      letterSpacing: "0.04em",
     }}>
       {verdict}
     </span>
   );
 }
 
-// Anatomy section
 function AnatomySection({ items }: { items: typeof LEARN_CONTENT.sections[0]["items"] }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       {(items as { label: string; color: string; description: string; example: string }[]).map((item) => (
-        <div key={item.label} style={{
-          background: C.surface,
-          borderRadius: "8px",
-          padding: "16px",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-            <span style={{
-              width: "8px", height: "8px", borderRadius: "9999px",
-              background: C.amber, flexShrink: 0
-            }} />
-            <span style={{ fontSize: "14px", fontWeight: 600, color: C.primary }}>
-              {item.label}
-            </span>
+        <div key={item.label} style={{ background: C.surface2, borderRadius: "10px", padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "9999px", background: C.mint, flexShrink: 0, display: "inline-block" }} />
+            <span style={{ fontSize: "13px", fontWeight: 600, color: C.primary, fontFamily: C.font }}>{item.label}</span>
           </div>
-          <p style={{ fontSize: "13px", color: C.secondary, margin: "0 0 10px", lineHeight: 1.5 }}>
-            {item.description}
-          </p>
-          <div style={{
-            background: C.amberDim,
-            borderRadius: "8px",
-            padding: "8px 12px",
-            fontFamily: "monospace",
-            fontSize: "12px",
-            color: C.amber,
-          }}>
+          <p style={{ fontSize: "12px", color: C.secondary, margin: "0 0 8px", lineHeight: 1.6, fontFamily: C.font }}>{item.description}</p>
+          <div style={{ background: C.mintDim, borderRadius: "6px", padding: "7px 10px", fontFamily: C.mono, fontSize: "11px", color: C.mint }}>
             {item.example}
           </div>
         </div>
@@ -83,63 +66,28 @@ function AnatomySection({ items }: { items: typeof LEARN_CONTENT.sections[0]["it
   );
 }
 
-// Myths section — accordion per myth
 function MythsSection({ items }: { items: typeof LEARN_CONTENT.sections[1]["items"] }) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const mythItems = items as { myth: string; reality: string; verdict: string }[];
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+    <div>
       {mythItems.map((item, i) => (
         <div key={i}>
           <button
             onClick={() => setExpanded(expanded === i ? null : i)}
-            aria-expanded={expanded === i}
             style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              padding: "14px 0",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: "12px",
-              textAlign: "left",
+              width: "100%", background: "none", border: "none", padding: "12px 0",
+              cursor: "pointer", display: "flex", alignItems: "flex-start",
+              justifyContent: "space-between", gap: "12px", textAlign: "left",
             }}
           >
-            <span
-              aria-hidden="true"
-              style={{
-                color: C.secondary,
-                display: "inline-block",
-                fontSize: "12px",
-                lineHeight: 1.5,
-                transform:
-                  expanded === i ? "rotate(90deg)" : "rotate(0deg)",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              ▶
-            </span>
-            <span style={{
-              fontSize: "13px",
-              color: C.secondary,
-              fontStyle: "italic",
-              lineHeight: 1.5,
-              flex: 1,
-            }}>
+            <span style={{ fontSize: "12px", color: C.secondary, fontStyle: "italic", lineHeight: 1.6, flex: 1, fontFamily: C.font }}>
               "{item.myth}"
             </span>
             <VerdictBadge verdict={item.verdict} />
           </button>
           {expanded === i && (
-            <div style={{
-              fontSize: "13px",
-              color: C.secondary,
-              lineHeight: 1.6,
-              paddingBottom: "14px",
-              paddingRight: "8px",
-            }}>
+            <div style={{ fontSize: "12px", color: C.secondary, lineHeight: 1.7, paddingBottom: "12px", paddingRight: "8px", fontFamily: C.font }}>
               {item.reality}
             </div>
           )}
@@ -150,7 +98,6 @@ function MythsSection({ items }: { items: typeof LEARN_CONTENT.sections[1]["item
   );
 }
 
-// Examples section
 function ExamplesSection({ items }: { items: typeof LEARN_CONTENT.sections[2]["items"] }) {
   const exampleItems = items as {
     category: string;
@@ -158,65 +105,26 @@ function ExamplesSection({ items }: { items: typeof LEARN_CONTENT.sections[2]["i
     good: { label: string; prompt: string; why: string };
   }[];
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {exampleItems.map((item) => (
         <div key={item.category}>
           <span style={{
-            background: C.tealDim,
-            color: C.teal,
-            padding: "3px 12px",
-            borderRadius: "9999px",
-            fontSize: "11px",
-            fontWeight: 600,
-            display: "inline-block",
-            marginBottom: "12px",
+            background: C.mintDim, color: C.mint, padding: "2px 10px", borderRadius: "9999px",
+            fontSize: "10px", fontWeight: 700, display: "inline-block", marginBottom: "10px",
+            fontFamily: C.mono, letterSpacing: "0.05em",
           }}>
             {item.category}
           </span>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-            {/* Weak */}
-            <div style={{
-              border: `0.5px solid ${C.redBorder}`,
-              borderRadius: "8px",
-              padding: "12px",
-            }}>
-              <div style={{ fontSize: "11px", color: C.falseText, fontWeight: 600, marginBottom: "8px" }}>
-                {item.bad.label}
-              </div>
-              <div style={{
-                fontFamily: "monospace",
-                fontSize: "12px",
-                color: C.primary,
-                marginBottom: "8px",
-                lineHeight: 1.5,
-              }}>
-                {item.bad.prompt}
-              </div>
-              <div style={{ fontSize: "11px", color: C.secondary, lineHeight: 1.4 }}>
-                {item.bad.why}
-              </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            <div style={{ border: `1px solid ${C.redDim}`, borderRadius: "8px", padding: "10px" }}>
+              <div style={{ fontSize: "10px", color: C.red, fontWeight: 700, marginBottom: "6px", fontFamily: C.mono }}>{item.bad.label}</div>
+              <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.primary, marginBottom: "6px", lineHeight: 1.5 }}>{item.bad.prompt}</div>
+              <div style={{ fontSize: "11px", color: C.secondary, lineHeight: 1.4, fontFamily: C.font }}>{item.bad.why}</div>
             </div>
-            {/* Strong */}
-            <div style={{
-              border: `0.5px solid ${C.tealBorder}`,
-              borderRadius: "8px",
-              padding: "12px",
-            }}>
-              <div style={{ fontSize: "11px", color: C.teal, fontWeight: 600, marginBottom: "8px" }}>
-                {item.good.label}
-              </div>
-              <div style={{
-                fontFamily: "monospace",
-                fontSize: "12px",
-                color: C.primary,
-                marginBottom: "8px",
-                lineHeight: 1.5,
-              }}>
-                {item.good.prompt}
-              </div>
-              <div style={{ fontSize: "11px", color: C.secondary, lineHeight: 1.4 }}>
-                {item.good.why}
-              </div>
+            <div style={{ border: `1px solid ${C.mintDim}`, borderRadius: "8px", padding: "10px" }}>
+              <div style={{ fontSize: "10px", color: C.mint, fontWeight: 700, marginBottom: "6px", fontFamily: C.mono }}>{item.good.label}</div>
+              <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.primary, marginBottom: "6px", lineHeight: 1.5 }}>{item.good.prompt}</div>
+              <div style={{ fontSize: "11px", color: C.secondary, lineHeight: 1.4, fontFamily: C.font }}>{item.good.why}</div>
             </div>
           </div>
         </div>
@@ -225,65 +133,7 @@ function ExamplesSection({ items }: { items: typeof LEARN_CONTENT.sections[2]["i
   );
 }
 
-function ImpactSection({ items }: { items: typeof LEARN_CONTENT.sections[3]["items"] }) {
-  const impactItems = items as {
-    metric: string;
-    point: string;
-    detail: string;
-  }[];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      {impactItems.map((item) => (
-        <div
-          key={item.metric}
-          style={{
-            border: `0.5px solid ${C.tealBorder}`,
-            borderRadius: "8px",
-            padding: "14px",
-            background: C.tealDim,
-          }}
-        >
-          <div
-            style={{
-              color: C.teal,
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              marginBottom: "8px",
-              textTransform: "uppercase",
-            }}
-          >
-            {item.metric}
-          </div>
-          <div
-            style={{
-              color: C.primary,
-              fontSize: "14px",
-              fontWeight: 600,
-              lineHeight: 1.45,
-              marginBottom: "6px",
-            }}
-          >
-            {item.point}
-          </div>
-          <div
-            style={{
-              color: C.secondary,
-              fontSize: "13px",
-              lineHeight: 1.55,
-            }}
-          >
-            {item.detail}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// FAQ section — accordion
-function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[4]["items"] }) {
+function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[3]["items"] }) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const faqItems = items as { question: string; answer: string }[];
   return (
@@ -292,34 +142,17 @@ function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[4]["items"
         <div key={i}>
           <button
             onClick={() => setExpanded(expanded === i ? null : i)}
-            aria-expanded={expanded === i}
             style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              padding: "14px 0",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "12px",
-              textAlign: "left",
+              width: "100%", background: "none", border: "none", padding: "12px 0",
+              cursor: "pointer", display: "flex", alignItems: "center",
+              justifyContent: "space-between", gap: "12px", textAlign: "left",
             }}
           >
-            <span style={{ fontSize: "13px", color: C.primary, lineHeight: 1.5, flex: 1 }}>
-              {item.question}
-            </span>
-            <span style={{ fontSize: "18px", color: C.secondary, flexShrink: 0, lineHeight: 1 }}>
-              {expanded === i ? "−" : "+"}
-            </span>
+            <span style={{ fontSize: "13px", color: C.primary, lineHeight: 1.5, flex: 1, fontFamily: C.font }}>{item.question}</span>
+            <span style={{ fontSize: "16px", color: C.secondary, flexShrink: 0, lineHeight: 1 }}>{expanded === i ? "−" : "+"}</span>
           </button>
           {expanded === i && (
-            <div style={{
-              fontSize: "13px",
-              color: C.secondary,
-              lineHeight: 1.6,
-              paddingBottom: "14px",
-            }}>
+            <div style={{ fontSize: "12px", color: C.secondary, lineHeight: 1.7, paddingBottom: "12px", fontFamily: C.font }}>
               {item.answer}
             </div>
           )}
@@ -330,30 +163,21 @@ function FAQSection({ items }: { items: typeof LEARN_CONTENT.sections[4]["items"
   );
 }
 
-function SectionDivider() {
-  return <div style={{ height: "1px", background: C.divider, margin: "24px 0" }} />;
-}
-
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string | null }) {
   return (
-    <div style={{ marginBottom: "20px" }}>
-      <div style={{ fontSize: "16px", fontWeight: 600, color: C.amber, marginBottom: subtitle ? "6px" : 0 }}>
+    <div style={{ marginBottom: "16px" }}>
+      <div style={{ fontSize: "11px", fontWeight: 700, color: C.mint, marginBottom: subtitle ? "4px" : 0, fontFamily: C.mono, textTransform: "uppercase", letterSpacing: "0.1em" }}>
         {title}
       </div>
-      {subtitle && (
-        <div style={{ fontSize: "13px", color: C.secondary }}>{subtitle}</div>
-      )}
+      {subtitle && <div style={{ fontSize: "12px", color: C.secondary, fontFamily: C.font }}>{subtitle}</div>}
     </div>
   );
 }
 
 export function LearnPanel({ isOpen, onClose }: LearnPanelProps) {
-  // Escape key to close
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [isOpen, onClose]);
@@ -374,114 +198,93 @@ export function LearnPanel({ isOpen, onClose }: LearnPanelProps) {
 
   if (!rendered) return null;
 
-  const [anatomy, myths, examples, impact, faq] = LEARN_CONTENT.sections;
+  const [anatomy, myths, examples, , faq] = LEARN_CONTENT.sections;
 
   return (
     <div
+      onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
         zIndex: 100,
+        background: "rgba(0,0,0,0.72)",
         display: "flex",
-        justifyContent: "flex-end",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 280ms ease",
       }}
     >
-      {/* Backdrop */}
       <div
-        onClick={onClose}
+        onClick={(e) => e.stopPropagation()}
         style={{
-          position: "absolute",
-          inset: 0,
-          background: "rgba(0,0,0,0.7)",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 350ms ease-out",
-        }}
-      />
-
-      {/* Panel */}
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          maxWidth: "480px",
-          height: "100%",
           background: C.surface,
-          overflowY: "auto",
-          transform: visible ? "translateX(0)" : "translateX(100%)",
-          transition: visible
-            ? "transform 350ms ease-out"
-            : "transform 280ms ease-in",
-          padding: "24px",
-          boxSizing: "border-box",
-          fontFamily: "Inter, sans-serif",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: "460px",
+          maxHeight: "85vh",
+          display: "flex",
+          flexDirection: "column",
+          transform: visible ? "translateY(0)" : "translateY(20px)",
+          transition: "transform 280ms ease",
+          overflow: "hidden",
         }}
       >
-        {/* Sticky header */}
         <div style={{
-          position: "sticky",
-          top: 0,
-          background: C.surface,
-          paddingBottom: "16px",
-          marginBottom: "8px",
-          zIndex: 1,
+          padding: "20px 24px 16px",
+          borderBottom: `1px solid ${C.border}`,
           display: "flex",
-          alignItems: "flex-start",
+          alignItems: "center",
           justifyContent: "space-between",
+          flexShrink: 0,
         }}>
           <div>
-            <div style={{ fontSize: "20px", fontWeight: 600, color: C.primary, marginBottom: "4px" }}>
-              Reference
+            <div style={{ fontSize: "16px", fontWeight: 700, color: C.primary, fontFamily: C.font }}>
+              Prompt Engineering 101
             </div>
-            <div style={{ fontSize: "12px", color: C.secondary }}>
-              Tap anything to explore
+            <div style={{ fontSize: "11px", color: C.secondary, fontFamily: C.mono, marginTop: "2px" }}>
+              Tap any section to expand
             </div>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close reference"
-            style={{
-              background: "none",
-              border: "none",
-              color: C.secondary,
-              fontSize: "24px",
-              cursor: "pointer",
-              lineHeight: 1,
-              padding: "0 0 0 8px",
-            }}
+            style={{ background: "none", border: "none", color: C.secondary, fontSize: "22px", cursor: "pointer", lineHeight: 1, padding: "4px" }}
           >
             ×
           </button>
         </div>
 
-        {/* Anatomy */}
-        <SectionHeader title={anatomy.title} subtitle={anatomy.subtitle as string | null} />
-        <AnatomySection items={anatomy.items} />
+        <div style={{ overflowY: "auto", padding: "20px 24px", flex: 1 }}>
+          <SectionHeader title={anatomy.title} subtitle={anatomy.subtitle as string | null} />
+          <AnatomySection items={anatomy.items} />
+          <div style={{ height: "1px", background: C.border, margin: "20px 0" }} />
+          <SectionHeader title={myths.title} subtitle={myths.subtitle as string | null} />
+          <MythsSection items={myths.items} />
+          <div style={{ height: "1px", background: C.border, margin: "20px 0" }} />
+          <SectionHeader title={examples.title} subtitle={examples.subtitle as string | null} />
+          <ExamplesSection items={examples.items} />
+          <div style={{ height: "1px", background: C.border, margin: "20px 0" }} />
+          <SectionHeader title={faq.title} subtitle={faq.subtitle as string | null} />
+          <FAQSection items={faq.items} />
+          <div style={{ height: "20px" }} />
+        </div>
 
-        <SectionDivider />
-
-        {/* Myths */}
-        <SectionHeader title={myths.title} subtitle={myths.subtitle as string | null} />
-        <MythsSection items={myths.items} />
-
-        <SectionDivider />
-
-        {/* Examples */}
-        <SectionHeader title={examples.title} subtitle={examples.subtitle as string | null} />
-        <ExamplesSection items={examples.items} />
-
-        <SectionDivider />
-
-        {/* Impact */}
-        <SectionHeader title={impact.title} subtitle={impact.subtitle as string | null} />
-        <ImpactSection items={impact.items} />
-
-        <SectionDivider />
-
-        {/* FAQ */}
-        <SectionHeader title={faq.title} subtitle={faq.subtitle as string | null} />
-        <FAQSection items={faq.items} />
-
-        <div style={{ height: "40px" }} />
+        <div style={{ padding: "16px 24px", borderTop: `1px solid ${C.border}`, flexShrink: 0 }}>
+          <button
+            onClick={onClose}
+            style={{
+              width: "100%", height: "42px", background: "transparent",
+              border: `1px solid ${C.border}`, color: C.primary, borderRadius: "10px",
+              fontSize: "14px", fontWeight: 600, cursor: "pointer", fontFamily: C.font,
+              transition: "border-color 0.15s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.mint)}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.border)}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
