@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { safeStorage } from "../lib/safeStorage";
 
 export const STORAGE_KEYS = {
   STREAK: "promptshot_streak",
@@ -15,6 +16,8 @@ export interface LocalScore {
   total: number;
   challenge_id?: string;
   user_prompt?: string;
+  waterMl?: number;
+  co2Grams?: number;
 }
 
 export type GameState = "challenge" | "loading" | "results" | "impact" | "already-played";
@@ -25,7 +28,7 @@ export function useGameState() {
 
   const getLocalHistory = (): LocalScore[] => {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) ?? "[]");
+      return JSON.parse(safeStorage.getItem(STORAGE_KEYS.HISTORY) ?? "[]");
     } catch {
       return [];
     }
@@ -34,7 +37,7 @@ export function useGameState() {
   const saveLocalScore = (entry: LocalScore) => {
     const history = getLocalHistory();
     history.push(entry);
-    localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
+    safeStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
   };
 
   const calculateLocalStreak = (): number => {
@@ -58,8 +61,8 @@ export function useGameState() {
       }
     }
 
-    localStorage.setItem(STORAGE_KEYS.STREAK, String(calculatedStreak));
-    localStorage.setItem(STORAGE_KEYS.LAST_PLAYED, today);
+    safeStorage.setItem(STORAGE_KEYS.STREAK, String(calculatedStreak));
+    safeStorage.setItem(STORAGE_KEYS.LAST_PLAYED, today);
     setStreak(calculatedStreak);
     return calculatedStreak;
   };
@@ -77,13 +80,15 @@ export function useGameState() {
       total: s.total,
       user_prompt: s.user_prompt ?? "",
       played_at: s.played_at,
+      water_ml: s.waterMl ?? 10,
+      co2_grams: s.co2Grams ?? 0.1,
     }));
 
     await supabase.from("scores").upsert(rows, { onConflict: "user_id,played_at" });
 
-    localStorage.removeItem(STORAGE_KEYS.HISTORY);
-    localStorage.removeItem(STORAGE_KEYS.STREAK);
-    localStorage.removeItem(STORAGE_KEYS.LAST_PLAYED);
+    safeStorage.removeItem(STORAGE_KEYS.HISTORY);
+    safeStorage.removeItem(STORAGE_KEYS.STREAK);
+    safeStorage.removeItem(STORAGE_KEYS.LAST_PLAYED);
   };
 
   return {

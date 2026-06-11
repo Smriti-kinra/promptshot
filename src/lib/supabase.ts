@@ -1,9 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { safeStorage } from "./safeStorage";
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 
-export const supabase = createClient(supabaseUrl, publicAnonKey);
+export const supabase = createClient(supabaseUrl, publicAnonKey, {
+  auth: {
+    storage: safeStorage,
+    persistSession: true,
+    detectSessionInUrl: true,
+  }
+});
 
 export interface Challenge {
   id: string;

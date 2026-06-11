@@ -8,6 +8,7 @@ import { Topbar } from "./components/Topbar";
 import { useGameState } from "../hooks/useGameState";
 import { scorePrompt, simulateScore, mockScore } from "../lib/scorer";
 import type { ScoreResult } from "../lib/scorer";
+import { safeStorage } from "../lib/safeStorage";
 
 // ─── hooks ────────────────────────────────────────────────────────────────────
 
@@ -298,7 +299,7 @@ export default function App() {
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [difficulty, setDifficulty] = useState<string>(
-    () => localStorage.getItem("promptshot_difficulty") ?? "BEGINNER",
+    () => safeStorage.getItem("promptshot_difficulty") ?? "BEGINNER",
   );
 
   const [userPrompt, setUserPrompt] = useState("");
@@ -328,7 +329,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("promptshot_difficulty", difficulty);
+    safeStorage.setItem("promptshot_difficulty", difficulty);
   }, [difficulty]);
 
   useEffect(() => {
@@ -360,7 +361,7 @@ export default function App() {
           .maybeSingle();
         if (existing) hasPlayed = true;
       } else {
-        setStreak(parseInt(localStorage.getItem("promptshot_streak") ?? "0", 10));
+        setStreak(parseInt(safeStorage.getItem("promptshot_streak") ?? "0", 10));
         const todayEntry = getLocalHistory().find((s) => s.played_at === today);
         if (todayEntry) hasPlayed = true;
       }
