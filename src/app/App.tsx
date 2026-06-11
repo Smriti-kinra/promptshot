@@ -47,6 +47,13 @@ function getBrevityColor(length: number): string {
   return "#EF4444";
 }
 
+function getWaterComparison(ml: number): string {
+  if (ml <= 10) return "roughly a teaspoon";
+  if (ml <= 30) return "roughly a tablespoon";
+  if (ml <= 50) return "a small shot glass";
+  return "a quarter cup";
+}
+
 function LoadingSkeleton() {
   return (
     <>
@@ -73,27 +80,44 @@ function AlreadyPlayed({
   score,
   challenge,
   onOpenLearn,
+  personalSavings,
+  communitySavings,
 }: {
   score: ScoreResult | null;
   challenge: Challenge | null;
   onOpenLearn: () => void;
+  personalSavings: { waterMl: number; co2Grams: number };
+  communitySavings: { waterLiters: number; co2Kg: number };
 }) {
   const { h, m } = useCountdownToMidnight();
 
   const bars = [
-    { label: "Accuracy", value: score?.accuracy ?? 0 },
-    { label: "Format", value: score?.format ?? 0 },
-    { label: "Brevity", value: score?.brevity ?? 0 },
+    {
+      label: "Accuracy",
+      value: score?.accuracy ?? 0,
+      tooltip: "Measures how well your prompt captures the required semantic details, meaning, and nuances of the target output."
+    },
+    {
+      label: "Format",
+      value: score?.format ?? 0,
+      tooltip: "Evaluates whether your prompt correctly enforces structural constraints, length limits, styling, and output type specified in the target."
+    },
+    {
+      label: "Brevity",
+      value: score?.brevity ?? 0,
+      tooltip: "Measures prompt efficiency. Shorter prompts receive higher scores (100 pts for <60 chars, scaling down to 20 pts for >300 chars)."
+    },
   ];
 
   return (
     <div
       style={{
         fontFamily: "Inter, sans-serif",
-        background: "var(--ps-background)",
+        background: "#0E1E14", // Shipped to minty near-black since they played
         color: "var(--ps-text-primary)",
         minHeight: "calc(100vh - 56px)",
         padding: "24px",
+        transition: "background 1.5s ease-in-out",
       }}
     >
       <div style={{ maxWidth: "500px", margin: "0 auto" }}>
@@ -135,7 +159,8 @@ function AlreadyPlayed({
           {score && (
             <div style={{ marginBottom: "24px" }}>
               {bars.map((item) => (
-                <div key={item.label} style={{ marginBottom: "12px" }}>
+                <div key={item.label} className="ps-tooltip-container" style={{ marginBottom: "12px" }}>
+                  <div className="ps-tooltip-text">{item.tooltip}</div>
                   <div
                     style={{
                       display: "flex",
@@ -144,7 +169,7 @@ function AlreadyPlayed({
                       fontSize: "var(--ps-text-secondary-size)",
                     }}
                   >
-                    <span style={{ color: "var(--ps-text-secondary)" }}>{item.label}</span>
+                    <span style={{ color: "var(--ps-text-secondary)" }}>{item.label} ⓘ</span>
                     <span style={{ color: "var(--ps-text-primary)" }}>{item.value}/100</span>
                   </div>
                   <div style={{ height: "4px", background: "#222", borderRadius: "9999px", overflow: "hidden" }}>
@@ -163,6 +188,86 @@ function AlreadyPlayed({
 
           <div style={{ fontSize: "14px", color: "#888880", textAlign: "center", marginBottom: "24px" }}>
             Next challenge in {h}h {m}m
+          </div>
+
+          {/* Lifetime & Community Eco Dashboard */}
+          <div
+            style={{
+              borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+              paddingTop: "24px",
+              marginBottom: "24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(20, 184, 166, 0.06)",
+                borderLeft: "3px solid var(--ps-teal)",
+                padding: "16px",
+                borderRadius: "8px",
+                textAlign: "left",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "Space Grotesk",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "var(--ps-teal)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  marginBottom: "4px",
+                }}
+              >
+                Your Lifetime Impact
+              </div>
+              <div style={{ fontSize: "14px", color: "var(--ps-text-primary)", fontWeight: 500 }}>
+                💧 {personalSavings.waterMl >= 1000
+                  ? `${(personalSavings.waterMl / 1000).toFixed(2)}L`
+                  : `${personalSavings.waterMl}ml`}{" "}
+                water saved
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--ps-text-secondary)", marginTop: "2px" }}>
+                🌲 {personalSavings.co2Grams >= 1000
+                  ? `${(personalSavings.co2Grams / 1000).toFixed(2)}kg`
+                  : `${personalSavings.co2Grams.toFixed(2)}g`}{" "}
+                CO₂ prevented
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "rgba(20, 184, 166, 0.06)",
+                borderLeft: "3px solid var(--ps-teal)",
+                padding: "16px",
+                borderRadius: "8px",
+                textAlign: "left",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "Space Grotesk",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "var(--ps-teal)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  marginBottom: "4px",
+                }}
+              >
+                Global Community Impact
+              </div>
+              <div style={{ fontSize: "14px", color: "var(--ps-text-primary)", fontWeight: 500 }}>
+                💧 {communitySavings.waterLiters.toLocaleString(undefined, { maximumFractionDigits: 1 })}L{" "}
+                water saved
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--ps-text-secondary)", marginTop: "2px" }}>
+                🌲 {communitySavings.co2Kg.toLocaleString(undefined, { maximumFractionDigits: 1 })}kg{" "}
+                CO₂ prevented
+              </div>
+            </div>
           </div>
 
           <div style={{ textAlign: "center" }}>
@@ -297,6 +402,27 @@ export default function App() {
     migrateLocalScoresToSupabase,
   } = useGameState();
 
+  // View Transitions API Wrapper
+  const transitionToState = (newState: GameState) => {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        setGameState(newState);
+      });
+    } else {
+      setGameState(newState);
+    }
+  };
+
+  const [personalSavings, setPersonalSavings] = useState<{ waterMl: number; co2Grams: number }>({
+    waterMl: 0,
+    co2Grams: 0,
+  });
+
+  const [communitySavings, setCommunitySavings] = useState<{ waterLiters: number; co2Kg: number }>({
+    waterLiters: 12450, // Active baseline
+    co2Kg: 124.5,       // Active baseline
+  });
+
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [difficulty, setDifficulty] = useState<string>(
     () => safeStorage.getItem("promptshot_difficulty") ?? "BEGINNER",
@@ -345,6 +471,10 @@ export default function App() {
       const today = new Date().toISOString().split("T")[0];
       let hasPlayed = false;
 
+      // ─── Fetch Personal Savings ───
+      let localSavedWater = 0;
+      let localSavedCo2 = 0;
+
       if (session) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -360,11 +490,58 @@ export default function App() {
           .eq("played_at", today)
           .maybeSingle();
         if (existing) hasPlayed = true;
+
+        // Fetch user history for lifetime savings calculation
+        const { data: userScores } = await supabase
+          .from("scores")
+          .select("water_ml, co2_grams")
+          .eq("user_id", session.user.id);
+
+        if (userScores) {
+          userScores.forEach((s) => {
+            localSavedWater += (50 - (s.water_ml ?? 10));
+            localSavedCo2 += (0.5 - (s.co2_grams ?? 0.1));
+          });
+        }
       } else {
         setStreak(parseInt(safeStorage.getItem("promptshot_streak") ?? "0", 10));
-        const todayEntry = getLocalHistory().find((s) => s.played_at === today);
+        const history = getLocalHistory();
+        const todayEntry = history.find((s) => s.played_at === today);
         if (todayEntry) hasPlayed = true;
+
+        // Calculate from local history
+        history.forEach((s) => {
+          localSavedWater += (50 - (s.waterMl ?? 10));
+          localSavedCo2 += (0.5 - (s.co2Grams ?? 0.1));
+        });
       }
+
+      setPersonalSavings({
+        waterMl: Math.max(0, localSavedWater),
+        co2Grams: Math.max(0, localSavedCo2),
+      });
+
+      // ─── Fetch Global Community Savings ───
+      let globalWaterMl = 0;
+      let globalCo2G = 0;
+      try {
+        const { data: allScores, error } = await supabase
+          .from("scores")
+          .select("water_ml, co2_grams");
+        if (!error && allScores) {
+          allScores.forEach((s) => {
+            globalWaterMl += (50 - (s.water_ml ?? 10));
+            globalCo2G += (0.5 - (s.co2_grams ?? 0.1));
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching global scores:", err);
+      }
+
+      setCommunitySavings({
+        waterLiters: 12450 + (globalWaterMl / 1000),
+        co2Kg: 124.5 + (globalCo2G / 1000),
+      });
 
       // Secure retrieval: fetch ideal_prompt only if they have already played today
       const selectFields = hasPlayed
@@ -375,7 +552,7 @@ export default function App() {
       setChallenge(ch);
 
       if (!ch) {
-        setGameState("challenge");
+        transitionToState("challenge");
         return;
       }
 
@@ -400,9 +577,9 @@ export default function App() {
             waterMl: existingScore.water_ml ?? 10,
             co2Grams: existingScore.co2_grams ?? 0.1,
           });
-          setGameState("already-played");
+          transitionToState("already-played");
         } else {
-          setGameState("challenge");
+          transitionToState("challenge");
         }
       } else {
         const todayEntry = getLocalHistory().find((s) => s.played_at === today);
@@ -415,9 +592,9 @@ export default function App() {
             waterMl: todayEntry.waterMl ?? 10,
             co2Grams: todayEntry.co2Grams ?? 0.1,
           });
-          setGameState("already-played");
+          transitionToState("already-played");
         } else {
-          setGameState("challenge");
+          transitionToState("challenge");
         }
       }
     })();
@@ -429,7 +606,7 @@ export default function App() {
 
   const handleSubmit = async () => {
     if (!userPrompt.trim() || !challenge) return;
-    setGameState("loading");
+    transitionToState("loading");
 
     let result: ScoreResult;
 
@@ -485,12 +662,25 @@ export default function App() {
     if (result.idealPrompt) {
       setIdealPrompt(result.idealPrompt);
     }
-    setGameState("results");
+
+    // Dynamic savings update
+    const savedWaterThisTurn = 50 - result.waterMl;
+    const savedCo2ThisTurn = 0.5 - result.co2Grams;
+    setPersonalSavings((prev) => ({
+      waterMl: prev.waterMl + savedWaterThisTurn,
+      co2Grams: prev.co2Grams + savedCo2ThisTurn,
+    }));
+    setCommunitySavings((prev) => ({
+      waterLiters: prev.waterLiters + (savedWaterThisTurn / 1000),
+      co2Kg: prev.co2Kg + (savedCo2ThisTurn / 1000),
+    }));
+
+    transitionToState("results");
     setTimeout(() => setAnimateScore(true), 100);
     
     // Automatically transition results -> impact after 2000ms
     setTimeout(() => {
-      setGameState("impact");
+      transitionToState("impact");
     }, 2000);
 
     if (result.total < 210) {
@@ -539,12 +729,14 @@ export default function App() {
     />
   );
 
+  const isEcoState = gameState === "impact" || gameState === "results" || gameState === "already-played";
   const contentStyle: React.CSSProperties = {
     fontFamily: "Inter, sans-serif",
-    background: "var(--ps-background)",
+    background: isEcoState ? "#0E1E14" : "var(--ps-background)",
     color: "var(--ps-text-primary)",
     minHeight: "calc(100vh - 56px)",
     padding: "24px",
+    transition: "background 1.5s ease-in-out",
   };
 
   if (gameState === "already-played") {
@@ -555,6 +747,8 @@ export default function App() {
           score={score}
           challenge={challenge}
           onOpenLearn={() => setShowLearnPanel(true)}
+          personalSavings={personalSavings}
+          communitySavings={communitySavings}
         />
         <LearnPanel isOpen={showLearnPanel} onClose={() => setShowLearnPanel(false)} />
       </>
@@ -688,21 +882,27 @@ export default function App() {
                     strokeDashoffset={`${2 * Math.PI * 85 * (1 - score.accuracy / 100)}`}
                     transform="rotate(-90 100 100)"
                     style={{ transition: animateScore ? "stroke-dashoffset 0.8s ease-out 0s" : "none" }}
-                  />
+                  >
+                    <title>Accuracy: {score.accuracy}/100</title>
+                  </circle>
                   <circle cx="100" cy="100" r="60" fill="none" stroke="#222" strokeWidth="12" />
                   <circle cx="100" cy="100" r="60" fill="none" stroke="var(--ps-amber)" strokeWidth="12"
                     strokeDasharray={`${2 * Math.PI * 60}`}
                     strokeDashoffset={`${2 * Math.PI * 60 * (1 - score.format / 100)}`}
                     transform="rotate(-90 100 100)"
                     style={{ transition: animateScore ? "stroke-dashoffset 0.8s ease-out 0.2s" : "none" }}
-                  />
+                  >
+                    <title>Format: {score.format}/100</title>
+                  </circle>
                   <circle cx="100" cy="100" r="35" fill="none" stroke="#222" strokeWidth="12" />
                   <circle cx="100" cy="100" r="35" fill="none" stroke="var(--ps-amber)" strokeWidth="12"
                     strokeDasharray={`${2 * Math.PI * 35}`}
                     strokeDashoffset={`${2 * Math.PI * 35 * (1 - score.brevity / 100)}`}
                     transform="rotate(-90 100 100)"
                     style={{ transition: animateScore ? "stroke-dashoffset 0.8s ease-out 0.4s" : "none" }}
-                  />
+                  >
+                    <title>Brevity: {score.brevity}/100</title>
+                  </circle>
                   <text x="100" y="95" textAnchor="middle" fill="var(--ps-text-primary)" fontSize="40" fontWeight="600">{score.total}</text>
                   <text x="100" y="115" textAnchor="middle" fill="var(--ps-text-secondary)" fontSize="20">/300</text>
                 </svg>
@@ -713,13 +913,26 @@ export default function App() {
 
               <div style={{ marginBottom: "24px" }}>
                 {[
-                  { label: "Accuracy", value: score.accuracy },
-                  { label: "Format", value: score.format },
-                  { label: "Brevity", value: score.brevity },
+                  {
+                    label: "Accuracy",
+                    value: score.accuracy,
+                    tooltip: "Measures how well your prompt captures the required semantic details, meaning, and nuances of the target output."
+                  },
+                  {
+                    label: "Format",
+                    value: score.format,
+                    tooltip: "Evaluates whether your prompt correctly enforces structural constraints, length limits, styling, and output type specified in the target."
+                  },
+                  {
+                    label: "Brevity",
+                    value: score.brevity,
+                    tooltip: "Measures prompt efficiency. Shorter prompts receive higher scores (100 pts for <60 chars, scaling down to 20 pts for >300 chars)."
+                  },
                 ].map((item) => (
-                  <div key={item.label} style={{ marginBottom: "12px" }}>
+                  <div key={item.label} className="ps-tooltip-container" style={{ marginBottom: "12px" }}>
+                    <div className="ps-tooltip-text">{item.tooltip}</div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px", fontSize: "var(--ps-text-secondary-size)" }}>
-                      <span style={{ color: "var(--ps-text-secondary)" }}>{item.label}</span>
+                      <span style={{ color: "var(--ps-text-secondary)" }}>{item.label} ⓘ</span>
                       <span style={{ color: "var(--ps-text-primary)" }}>{item.value}/100</span>
                     </div>
                     <div style={{ height: "4px", background: "#222", borderRadius: "9999px", overflow: "hidden" }}>
@@ -732,45 +945,75 @@ export default function App() {
               {gameState === "impact" && (
                 <div
                   style={{
-                    background: "var(--ps-surface)",
+                    background: "rgba(20, 184, 166, 0.12)",
                     borderLeft: "4px solid var(--ps-teal)",
                     padding: "24px",
-                    borderRadius: "8px",
+                    borderRadius: "16px",
                     marginBottom: "24px",
                     animation: "slideUp 0.6s ease-out forwards",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    flexDirection: "column",
                     gap: "16px",
                   }}
                 >
                   <style>{`@keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }`}</style>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
-                      This prompt used <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>1</span> API call
+                  
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
+                        This prompt used <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>1</span> API call
+                      </div>
+                      <div style={{ fontSize: "var(--ps-text-secondary-size)", color: "var(--ps-text-secondary)" }}>
+                        ≈ <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>{score.waterMl}ml</span> water ({getWaterComparison(score.waterMl)}) · ≈ <span style={{ color: "var(--ps-teal)", fontWeight: 600 }}>{score.co2Grams}g</span> CO₂
+                      </div>
                     </div>
-                    <div style={{ marginBottom: score.total < 180 ? "16px" : "0", fontSize: "var(--ps-text-secondary-size)", color: "var(--ps-text-secondary)" }}>
-                      ≈ <span style={{ color: "var(--ps-teal)" }}>{score.waterMl}ml</span> water · ≈ <span style={{ color: "var(--ps-teal)" }}>{score.co2Grams}g</span> CO₂
-                    </div>
-                    {score.total < 180 && (
-                      <>
-                        <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
-                          A score this low typically means 3+ follow-up prompts to reach this output
-                        </div>
-                        <div style={{ marginBottom: "16px", fontSize: "var(--ps-text-secondary-size)" }}>
-                          That adds ≈ 30ml water — about <span style={{ color: "var(--ps-amber)", fontWeight: 600 }}>a tablespoon</span>
-                        </div>
-                      </>
-                    )}
-                    <div style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontStyle: "italic" }}>
-                      Better prompts = less AI = less water. This is the skill.
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                      <WaterGlass waterMl={score.waterMl} />
+                      <span style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontWeight: 600 }}>
+                        {score.waterMl}ml
+                      </span>
                     </div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
-                    <WaterGlass waterMl={score.waterMl} />
-                    <span style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontWeight: 600 }}>
-                      {score.waterMl}ml
-                    </span>
+
+                  {score.total < 180 && (
+                    <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "16px" }}>
+                      <div style={{ marginBottom: "8px", fontSize: "var(--ps-text-secondary-size)" }}>
+                        A score this low typically means 3+ follow-up prompts to reach this output
+                      </div>
+                      <div style={{ fontSize: "var(--ps-text-secondary-size)" }}>
+                        That's ≈ 30ml more — <span style={{ color: "var(--ps-amber)", fontWeight: 600 }}>roughly a tablespoon</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "16px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "12px" }}>
+                      <div>
+                        <div style={{ fontFamily: "Space Grotesk", fontSize: "11px", fontWeight: 600, color: "var(--ps-teal)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+                          Lifetime Savings
+                        </div>
+                        <div style={{ fontSize: "13px", color: "var(--ps-text-primary)", fontWeight: 500 }}>
+                          💧 {personalSavings.waterMl >= 1000 ? `${(personalSavings.waterMl / 1000).toFixed(2)}L` : `${personalSavings.waterMl}ml`}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "var(--ps-text-secondary)" }}>
+                          🌲 {personalSavings.co2Grams >= 1000 ? `${(personalSavings.co2Grams / 1000).toFixed(2)}kg` : `${personalSavings.co2Grams.toFixed(1)}g`} CO₂
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: "Space Grotesk", fontSize: "11px", fontWeight: 600, color: "var(--ps-teal)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+                          Community Savings
+                        </div>
+                        <div style={{ fontSize: "13px", color: "var(--ps-text-primary)", fontWeight: 500 }}>
+                          💧 {communitySavings.waterLiters.toLocaleString(undefined, { maximumFractionDigits: 1 })}L
+                        </div>
+                        <div style={{ fontSize: "11px", color: "var(--ps-text-secondary)" }}>
+                          🌲 {communitySavings.co2Kg.toLocaleString(undefined, { maximumFractionDigits: 1 })}kg CO₂
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "var(--ps-text-caption)", color: "var(--ps-text-secondary)", fontStyle: "italic", marginTop: "8px" }}>
+                      Better prompts = less AI = less water. This is the skill.
+                    </div>
                   </div>
                 </div>
               )}
