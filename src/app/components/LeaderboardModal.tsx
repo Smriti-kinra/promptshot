@@ -9,7 +9,7 @@ const C = {
   primary: "#D4E8D4",
   secondary: "#4A6B4A",
   mint: "#6EE09B",
-  amber: "#F5C518",
+  amber: "var(--ps-amber)",
   red: "#FF5F5F",
   border: "#243B27",
   font: "'Space Grotesk', system-ui, sans-serif",
@@ -32,6 +32,7 @@ interface LeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   session: Session | null;
+  openCount?: number;
 }
 
 // ── Gate screen (not signed in) ─────────────────────────────────────────────
@@ -378,7 +379,7 @@ function LeaderboardRow({
 
 // ── Leaderboard screen (signed in) ──────────────────────────────────────────
 
-function LeaderboardScreen({ session, onClose }: { session: Session; onClose: () => void }) {
+function LeaderboardScreen({ session, onClose, openCount }: { session: Session; onClose: () => void; openCount: number }) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -395,6 +396,8 @@ function LeaderboardScreen({ session, onClose }: { session: Session; onClose: ()
         .eq("played_at", today)
         .order("total", { ascending: false })
         .limit(20);
+
+      console.debug("[PromptShot] Leaderboard fetch — today:", today, "error:", error, "rows:", data?.length ?? 0, data);
 
       if (error || !data) {
         setLoading(false);
@@ -430,7 +433,7 @@ function LeaderboardScreen({ session, onClose }: { session: Session; onClose: ()
     };
 
     fetchLeaderboard();
-  }, [session]);
+  }, [session, openCount]);
 
   const handleSignOut = async () => {
     setSignOutLoading(true);
@@ -524,7 +527,7 @@ function LeaderboardScreen({ session, onClose }: { session: Session; onClose: ()
 
 // ── Main modal ──────────────────────────────────────────────────────────────
 
-export function LeaderboardModal({ isOpen, onClose, session }: LeaderboardModalProps) {
+export function LeaderboardModal({ isOpen, onClose, session, openCount = 0 }: LeaderboardModalProps) {
   const [visible, setVisible] = useState(false);
   const [rendered, setRendered] = useState(false);
 
@@ -620,7 +623,7 @@ export function LeaderboardModal({ isOpen, onClose, session }: LeaderboardModalP
         {/* Body */}
         <div style={{ overflowY: "auto", padding: "18px 20px 20px", flex: 1 }}>
           {session ? (
-            <LeaderboardScreen session={session} onClose={onClose} />
+            <LeaderboardScreen session={session} onClose={onClose} openCount={openCount} />
           ) : (
             <GateScreen onClose={onClose} />
           )}
