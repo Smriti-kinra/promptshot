@@ -87,9 +87,7 @@ export default function App() {
 
   const [challenge, setChallenge] = useState<import("../lib/supabase").Challenge | null>(null);
   const [isPlayingStarted, setIsPlayingStarted] = useState(false);
-  const [isSandboxMode, setIsSandboxMode] = useState(false);
   const [hasPlayedToday, setHasPlayedToday] = useState(false);
-  const [hasClickedAdmire, setHasClickedAdmire] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [difficulty, setDifficulty] = useState<string>(
     () => safeStorage.getItem("promptshot_difficulty") ?? "BEGINNER",
@@ -137,7 +135,6 @@ export default function App() {
     setAnimateScore(false);
     setUserPrompt("");
     setIsPlayingStarted(false);
-    setIsSandboxMode(false);
 
     (async () => {
       const today = new Date().toISOString().split("T")[0];
@@ -256,21 +253,11 @@ export default function App() {
 
   const handleDifficultyChange = (d: string) => setDifficulty(d);
 
-  const handlePlaySandbox = () => {
-    setIsSandboxMode(true);
-    setIsPlayingStarted(true);
-    setUserPrompt("");
-    setScore(null);
-    transitionToState("challenge");
-  };
-
   const handleBackToMenu = () => {
     setIsPlayingStarted(false);
-    setIsSandboxMode(false);
-    // If the user already completed today's challenge, send them to the return screen
+    // If the user already completed today's challenge, send them to the stats screen
     // rather than the landing challenge view
-    if (hasPlayedToday && !isSandboxMode) {
-      setHasClickedAdmire(false);
+    if (hasPlayedToday) {
       transitionToState("already-played");
     } else {
       transitionToState("challenge");
@@ -291,58 +278,51 @@ export default function App() {
         result = mockScore(userPrompt);
       }
 
-      if (!isSandboxMode) {
-        const today = new Date().toISOString().split("T")[0];
-        const { error: insertErr } = await supabase.from("scores").insert({
-          user_id: session.user.id,
-          challenge_id: challenge.id,
-          accuracy: result.accuracy,
-          format: result.format,
-          brevity: result.brevity,
-          total: result.total,
-          user_prompt: userPrompt,
-          played_at: today,
-          water_ml: result.waterMl,
-          co2_grams: result.co2Grams,
-        });
-        console.debug("[PromptShot] Score insert result — error:", insertErr, "played_at:", today);
+      const today = new Date().toISOString().split("T")[0];
+      const { error: insertErr } = await supabase.from("scores").insert({
+        user_id: session.user.id,
+        challenge_id: challenge.id,
+        accuracy: result.accuracy,
+        format: result.format,
+        brevity: result.brevity,
+        total: result.total,
+        user_prompt: userPrompt,
+        played_at: today,
+        water_ml: result.waterMl,
+        co2_grams: result.co2Grams,
+      });
+      console.debug("[PromptShot] Score insert result — error:", insertErr, "played_at:", today);
 
-        const newStreak = await calculateAndUpdateStreak(session.user.id);
-        setStreak(newStreak);
-      }
+      const newStreak = await calculateAndUpdateStreak(session.user.id);
+      setStreak(newStreak);
     } else {
       result = await simulateScore(userPrompt, challenge.id);
 
-      if (!isSandboxMode) {
-        const today = new Date().toISOString().split("T")[0];
-        saveLocalScore({
-          played_at: today,
-          accuracy: result.accuracy,
-          format: result.format,
-          brevity: result.brevity,
-          total: result.total,
-          challenge_id: challenge.id,
-          user_prompt: userPrompt,
-          waterMl: result.waterMl,
-          co2Grams: result.co2Grams,
-        });
+      const today = new Date().toISOString().split("T")[0];
+      saveLocalScore({
+        played_at: today,
+        accuracy: result.accuracy,
+        format: result.format,
+        brevity: result.brevity,
+        total: result.total,
+        challenge_id: challenge.id,
+        user_prompt: userPrompt,
+        waterMl: result.waterMl,
+        co2Grams: result.co2Grams,
+      });
 
-        const newStreak = calculateLocalStreak();
-        setStreak(newStreak);
-      }
+      const newStreak = calculateLocalStreak();
+      setStreak(newStreak);
     }
 
     setScore(result);
     if (result.idealPrompt) setIdealPrompt(result.idealPrompt);
 
-    if (!isSandboxMode) {
-      const savedWaterThisTurn = 50 - result.waterMl;
-      const savedCo2ThisTurn = 0.5 - result.co2Grams;
-      setPersonalSavings((prev) => ({ waterMl: prev.waterMl + savedWaterThisTurn, co2Grams: prev.co2Grams + savedCo2ThisTurn }));
-      setCommunitySavings((prev) => ({ waterLiters: prev.waterLiters + (savedWaterThisTurn / 1000), co2Kg: prev.co2Kg + (savedCo2ThisTurn / 1000) }));
-      // Mark played so the landing screen shows sandbox mode if user goes back
-      setHasPlayedToday(true);
-    }
+    const savedWaterThisTurn = 50 - result.waterMl;
+    const savedCo2ThisTurn = 0.5 - result.co2Grams;
+    setPersonalSavings((prev) => ({ waterMl: prev.waterMl + savedWaterThisTurn, co2Grams: prev.co2Grams + savedCo2ThisTurn }));
+    setCommunitySavings((prev) => ({ waterLiters: prev.waterLiters + (savedWaterThisTurn / 1000), co2Kg: prev.co2Kg + (savedCo2ThisTurn / 1000) }));
+    setHasPlayedToday(true);
 
     transitionToState("results");
     setTimeout(() => setAnimateScore(true), 100);
@@ -395,13 +375,11 @@ export default function App() {
       onToggleHint={() => setShowHint((v) => !v)}
       hasPlayedToday={hasPlayedToday}
       onStartPlay={() => {
-        setIsSandboxMode(false);
         setIsPlayingStarted(true);
         setUserPrompt("");
         setScore(null);
         transitionToState("challenge");
       }}
-      onPlaySandbox={handlePlaySandbox}
     />
   );
 
@@ -430,20 +408,6 @@ export default function App() {
 
   // ── already-played flow ───────────────────────────────────────────────────────
   if (gameState === "already-played") {
-    if (!hasClickedAdmire) {
-      return (
-        <>
-          {topbar}
-          <ReturnScreen
-            challenge={challenge}
-            score={score}
-            onAdmire={() => setHasClickedAdmire(true)}
-            onPlaySandbox={handlePlaySandbox}
-          />
-          {modals}
-        </>
-      );
-    }
     return (
       <>
         {topbar}
@@ -452,12 +416,6 @@ export default function App() {
           challenge={challenge}
           personalSavings={personalSavings}
           communitySavings={communitySavings}
-          onBackToMenu={() => {
-            // From the full stats view, go to the landing screen directly
-            setIsPlayingStarted(false);
-            setIsSandboxMode(false);
-            transitionToState("challenge");
-          }}
         />
         {modals}
       </>
@@ -477,9 +435,7 @@ export default function App() {
               difficulty={difficulty}
               hasPlayedToday={hasPlayedToday}
               onDifficultyChange={handleDifficultyChange}
-              onPlay={() => { setIsSandboxMode(false); setIsPlayingStarted(true); }}
-              onPlaySandbox={handlePlaySandbox}
-              onViewResults={() => transitionToState("already-played")}
+              onPlay={() => { setIsPlayingStarted(true); }}
             />
           )}
 
@@ -504,11 +460,9 @@ export default function App() {
               animateScore={animateScore}
               showAutoIdeal={showAutoIdeal}
               idealPrompt={idealPrompt}
-              isSandboxMode={isSandboxMode}
               personalSavings={personalSavings}
               communitySavings={communitySavings}
               onShare={handleShare}
-              onTryAgain={() => { setUserPrompt(""); setScore(null); transitionToState("challenge"); }}
               onBackToMenu={handleBackToMenu}
             />
           )}

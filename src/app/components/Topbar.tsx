@@ -109,7 +109,6 @@ function NavMenu({
   onOpenLearn,
   hasPlayedToday,
   onStartPlay,
-  onPlaySandbox,
 }: {
   open: boolean;
   onClose: () => void;
@@ -118,7 +117,6 @@ function NavMenu({
   onOpenLearn: () => void;
   hasPlayedToday?: boolean;
   onStartPlay?: () => void;
-  onPlaySandbox?: () => void;
 }) {
   return (
     <SlidePanel open={open} onClose={onClose} from="left" width={300}>
@@ -178,25 +176,14 @@ function NavMenu({
         <span style={{ fontFamily: C.font, fontSize: "14px", color: "var(--ps-text-secondary)" }}>›</span>
       </button>
 
-      {/* Play / Sandbox link */}
-      {hasPlayedToday ? (
-        onPlaySandbox && (
-          <button
-            onClick={() => { onClose(); onPlaySandbox(); }}
-            style={{ background: "none", border: "none", color: C.mint, fontSize: "14px", cursor: "pointer", padding: "10px 0", display: "block", width: "100%", textAlign: "left", fontFamily: C.font, fontWeight: 600 }}
-          >
-            Practice in Sandbox ›
-          </button>
-        )
-      ) : (
-        onStartPlay && (
-          <button
-            onClick={() => { onClose(); onStartPlay(); }}
-            style={{ background: "none", border: "none", color: C.mint, fontSize: "14px", cursor: "pointer", padding: "10px 0", display: "block", width: "100%", textAlign: "left", fontFamily: C.font, fontWeight: 600 }}
-          >
-            Play Today's Challenge ›
-          </button>
-        )
+      {/* Play link */}
+      {!hasPlayedToday && onStartPlay && (
+        <button
+          onClick={() => { onClose(); onStartPlay(); }}
+          style={{ background: "none", border: "none", color: C.mint, fontSize: "14px", cursor: "pointer", padding: "10px 0", display: "block", width: "100%", textAlign: "left", fontFamily: C.font, fontWeight: 600 }}
+        >
+          Play Today's Challenge ›
+        </button>
       )}
     </SlidePanel>
   );
@@ -213,7 +200,6 @@ export interface TopbarProps {
   onToggleHint?: () => void;
   hasPlayedToday?: boolean;
   onStartPlay?: () => void;
-  onPlaySandbox?: () => void;
 }
 
 export function Topbar({
@@ -223,7 +209,6 @@ export function Topbar({
   onOpenLeaderboard,
   hasPlayedToday,
   onStartPlay,
-  onPlaySandbox,
 }: TopbarProps) {
   const [showNav, setShowNav] = useState(false);
 
@@ -259,7 +244,7 @@ export function Topbar({
         <button
           onClick={onOpenLearn}
           aria-label="Help / Learn"
-          style={{ ...iconBtnStyle, fontSize: "18px", fontWeight: 600, fontFamily: C.font }}
+          style={{ ...iconBtnStyle, fontSize: "24px", fontWeight: 700, fontFamily: C.font }}
           onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
           onMouseLeave={(e) => (e.currentTarget.style.color = C.secondary)}
         >
@@ -269,15 +254,15 @@ export function Topbar({
         {/* Center — empty */}
         <div style={{ textAlign: "center" }} />
 
-        {/* Right — 🏆 leaderboard */}
+        {/* Right — Leaderboard (#) */}
         <button
           onClick={onOpenLeaderboard}
           aria-label="Leaderboard"
-          style={{ ...iconBtnStyle, fontSize: "20px" }}
+          style={{ ...iconBtnStyle, fontSize: "24px", fontWeight: 700, fontFamily: C.font }}
           onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
           onMouseLeave={(e) => (e.currentTarget.style.color = C.secondary)}
         >
-          🏆
+          #
         </button>
       </div>
 
@@ -289,7 +274,6 @@ export function Topbar({
         onOpenLearn={onOpenLearn}
         hasPlayedToday={hasPlayedToday}
         onStartPlay={onStartPlay}
-        onPlaySandbox={onPlaySandbox}
       />
     </>
   );

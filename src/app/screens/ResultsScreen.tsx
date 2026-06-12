@@ -8,11 +8,9 @@ interface ResultsScreenProps {
   animateScore: boolean;
   showAutoIdeal: boolean;
   idealPrompt: string;
-  isSandboxMode: boolean;
   personalSavings: { waterMl: number; co2Grams: number };
   communitySavings: { waterLiters: number; co2Kg: number };
   onShare: () => void;
-  onTryAgain: () => void;
   onBackToMenu: () => void;
 }
 
@@ -201,26 +199,14 @@ export function ResultsScreen({
           Share result
         </button>
 
-        {isSandboxMode && (
-          <div style={{ display: "flex", gap: "12px", width: "100%" }}>
-            <button
-              onClick={onTryAgain}
-              style={{ flex: 1, height: "48px", background: "transparent", border: "1px solid var(--ps-border)", color: "var(--ps-text-primary)", borderRadius: "8px", fontSize: "var(--ps-text-secondary-size)", fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease", fontFamily: "Space Grotesk" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "var(--ps-amber)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "var(--ps-border)"; }}
-            >
-              Try Again
-            </button>
-            <button
-              onClick={onBackToMenu}
-              style={{ flex: 1, height: "48px", background: "transparent", border: "1px solid var(--ps-border)", color: "var(--ps-text-primary)", borderRadius: "8px", fontSize: "var(--ps-text-secondary-size)", fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease", fontFamily: "Space Grotesk" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "var(--ps-amber)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "var(--ps-border)"; }}
-            >
-              Back to Menu
-            </button>
-          </div>
-        )}
+        <button
+          onClick={onBackToMenu}
+          style={{ width: "100%", height: "48px", background: "transparent", border: "1px solid var(--ps-border)", color: "var(--ps-text-primary)", borderRadius: "8px", fontSize: "var(--ps-text-secondary-size)", fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease", fontFamily: "Space Grotesk" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "var(--ps-amber)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "var(--ps-border)"; }}
+        >
+          Go to Dashboard
+        </button>
       </div>
     </>
   );

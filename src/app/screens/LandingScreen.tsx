@@ -5,8 +5,6 @@ interface LandingScreenProps {
   hasPlayedToday: boolean;
   onDifficultyChange: (d: string) => void;
   onPlay: () => void;
-  onPlaySandbox: () => void;
-  onViewResults: () => void;
 }
 
 export function LandingScreen({
@@ -14,8 +12,6 @@ export function LandingScreen({
   hasPlayedToday,
   onDifficultyChange,
   onPlay,
-  onPlaySandbox,
-  onViewResults,
 }: LandingScreenProps) {
   return (
     <div
@@ -101,20 +97,22 @@ export function LandingScreen({
       {hasPlayedToday ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", alignItems: "center" }}>
           <button
-            onClick={onPlaySandbox}
-            style={{ width: "100%", maxWidth: "280px", height: "52px", background: "var(--ps-amber)", color: "#000", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: 700, cursor: "pointer", transition: "transform 0.15s ease", fontFamily: "Space Grotesk" }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            disabled
+            style={{
+              width: "100%",
+              maxWidth: "280px",
+              height: "52px",
+              background: "rgba(255, 255, 255, 0.05)",
+              color: "var(--ps-text-secondary)",
+              border: "1px solid var(--ps-border)",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: 700,
+              cursor: "not-allowed",
+              fontFamily: "Space Grotesk"
+            }}
           >
-            Practice in Sandbox Mode
-          </button>
-          <button
-            onClick={onViewResults}
-            style={{ width: "100%", maxWidth: "280px", height: "52px", background: "transparent", color: "var(--ps-text-primary)", border: "1px solid var(--ps-border)", borderRadius: "8px", fontSize: "16px", fontWeight: 700, cursor: "pointer", transition: "all 0.15s ease", fontFamily: "Space Grotesk" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)"; e.currentTarget.style.borderColor = "var(--ps-amber)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "var(--ps-border)"; }}
-          >
-            View Today's Results
+            Already Played Today
           </button>
         </div>
       ) : (

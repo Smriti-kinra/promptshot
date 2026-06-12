@@ -16,13 +16,11 @@ export function AlreadyPlayed({
   challenge,
   personalSavings,
   communitySavings,
-  onBackToMenu,
 }: {
   score: ScoreResult | null;
   challenge: Challenge | null;
   personalSavings: { waterMl: number; co2Grams: number };
   communitySavings: { waterLiters: number; co2Kg: number };
-  onBackToMenu: () => void;
 }) {
   const { h, m, s } = useCountdownToMidnight();
 
@@ -44,28 +42,6 @@ export function AlreadyPlayed({
       }}
     >
       <div style={{ maxWidth: "500px", margin: "0 auto" }}>
-        <button
-          onClick={onBackToMenu}
-          style={{
-            background: "none",
-            border: "none",
-            color: "var(--ps-text-secondary)",
-            fontSize: "14px",
-            cursor: "pointer",
-            padding: "8px 0",
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            fontFamily: "Space Grotesk",
-            marginBottom: "16px",
-            transition: "color 0.15s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ps-text-primary)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ps-text-secondary)")}
-        >
-          ‹ Back to Home Menu
-        </button>
-
         {/* Logo wordmark */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
